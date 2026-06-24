@@ -42,8 +42,8 @@ export const SceneCard: React.FC<SceneCardProps> = ({
 
   // Layout values
   const height = isHero ? 120 : 112
-  const textColor = isLightScene ? '#1a1a1a' : '#fff'
-  const timeColor = isLightScene ? '#222222' : '#fff'
+  const textColor = isLightScene ? '#1a1a1a' : '#888'
+  const timeColor = accentColor
   const secondaryColor = isLightScene ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)'
 
   // Animation variants

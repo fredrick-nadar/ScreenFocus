@@ -28,7 +28,10 @@ export function InsightCards() {
             style={{ borderColor: borderColors[insight.type] }}
           >
             <span className="text-sm mt-0.5 shrink-0">{insight.icon}</span>
-            <span className="text-[11px] text-white/60 leading-relaxed">
+            <span 
+              className="text-[11px] leading-relaxed"
+              style={{ color: borderColors[insight.type].replace(', 0.15)', ')').replace('rgba', 'rgb') }}
+            >
               {insight.text}
             </span>
           </motion.div>

@@ -61,7 +61,7 @@ export const Widget: React.FC<WidgetProps> = ({ data, timeOfDay, isExpanded, onT
           <span style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>
             Today's focus
           </span>
-          <div style={{ fontSize: '30px', fontWeight: 300, color: '#fff', lineHeight: 1.1, marginTop: '2px', marginBottom: '6px' }}>
+          <div style={{ fontSize: '30px', fontWeight: 300, color: 'var(--accent-color, #fff)', lineHeight: 1.1, marginTop: '2px', marginBottom: '6px' }}>
             {formatMins(activeMinutes)}
           </div>
           
@@ -94,7 +94,7 @@ export const Widget: React.FC<WidgetProps> = ({ data, timeOfDay, isExpanded, onT
           <span style={{ fontSize: '9px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)', fontWeight: 500 }}>
             System on
           </span>
-          <span style={{ fontSize: '13px', fontWeight: 500, color: 'rgba(255,255,255,0.45)', marginTop: '2px' }}>
+          <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--accent-color, rgba(255,255,255,0.45))', marginTop: '2px' }}>
             {formatMins(systemUptimeMinutes)}
           </span>
         </div>

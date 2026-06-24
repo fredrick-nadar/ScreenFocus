@@ -83,6 +83,9 @@ interface TrackingState {
   // Custom icons
   customIcons: Record<string, string>
 
+  // Background image
+  backgroundImage: string | null
+
   // System info
   systemInfo: SystemInfo | null
 
@@ -100,6 +103,8 @@ interface TrackingState {
   fetchCustomIcons: () => Promise<void>
   selectAndSetIcon: (appName: string) => Promise<void>
   deleteCustomIcon: (appName: string) => Promise<void>
+  fetchBackgroundImage: () => Promise<void>
+  updateCustomIcon: (appName: string, dataUrl: string) => void
   handleTrackingUpdate: (data: TrackingUpdate) => void
   toggleTracking: () => Promise<void>
 }
@@ -121,6 +126,7 @@ export const useTrackingStore = create<TrackingState>((set, get) => ({
   insights: [],
 
   customIcons: {},
+  backgroundImage: null,
 
   systemInfo: null,
 
@@ -135,7 +141,8 @@ export const useTrackingStore = create<TrackingState>((set, get) => ({
       get().fetchStreaks(),
       get().fetchInsights(),
       get().fetchSystemInfo(),
-      get().fetchCustomIcons()
+      get().fetchCustomIcons(),
+      get().fetchBackgroundImage()
     ])
     set({ isLoading: false })
   },
@@ -237,6 +244,21 @@ export const useTrackingStore = create<TrackingState>((set, get) => ({
     } catch (err) {
       console.error('Failed to delete custom icon:', err)
     }
+  },
+
+  fetchBackgroundImage: async () => {
+    try {
+      const backgroundImage = await api().getBackgroundImage()
+      set({ backgroundImage })
+    } catch (err) {
+      console.error('Failed to fetch background image:', err)
+    }
+  },
+
+  updateCustomIcon: (appName: string, dataUrl: string) => {
+    set((state) => ({
+      customIcons: { ...state.customIcons, [appName]: dataUrl }
+    }))
   },
 
   handleTrackingUpdate: (data: TrackingUpdate) => {

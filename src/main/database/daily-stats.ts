@@ -27,12 +27,12 @@ export function aggregateAndSaveTodayStats(): DailyStats {
   const totalActive = getTodayTotalActiveSeconds()
   const totalIdle = getTodayIdleSeconds()
 
-  const coding = categoryTotals['Coding'] || 0
-  const learning = categoryTotals['Learning'] || 0
-  const communication = categoryTotals['Communication'] || 0
-  const entertainment = categoryTotals['Entertainment'] || 0
-  const gaming = categoryTotals['Gaming'] || 0
-  const productive = coding + learning
+  const coding = (categoryTotals['editor'] || 0) + (categoryTotals['terminal'] || 0)
+  const learning = (categoryTotals['browser'] || 0) + (categoryTotals['ai'] || 0)
+  const communication = categoryTotals['comms'] || 0
+  const entertainment = 0 // No direct map anymore
+  const gaming = 0 // No direct map anymore
+  const productive = coding + learning + (categoryTotals['design'] || 0)
   const score = totalActive > 0 ? Math.round((productive / totalActive) * 100) : 0
 
   const stats: DailyStats = {
@@ -119,7 +119,7 @@ export function getWeeklyStats(): DailyStats[] {
 
 export function getStreaks(): StreakInfo[] {
   const db = getDb()
-  const categories = ['Coding', 'Learning', 'Gaming']
+  const categories = ['editor', 'browser', 'design']
   const streaks: StreakInfo[] = []
 
   for (const category of categories) {
@@ -164,11 +164,14 @@ export function getStreaks(): StreakInfo[] {
 
 function getCategoryColumn(category: string): string {
   const map: Record<string, string> = {
-    Coding: 'coding_time',
-    Learning: 'learning_time',
-    Communication: 'communication_time',
-    Entertainment: 'entertainment_time',
-    Gaming: 'gaming_time'
+    editor: 'coding_time',
+    terminal: 'coding_time',
+    browser: 'learning_time',
+    ai: 'learning_time',
+    comms: 'communication_time',
+    design: 'productive_time', // or just map it somewhere to keep stats working
+    os: 'screen_time',
+    default: 'screen_time'
   }
   return map[category] || 'screen_time'
 }

@@ -138,17 +138,57 @@ export function registerIpcHandlers(trackingService: TrackingService): void {
   })
 
   // ── Custom App Icons ──────────────────────────────────────────
-  ipcMain.handle('get-custom-icons', () => {
-    const db = getDb()
-    const rows = db.prepare('SELECT app_name, icon_data FROM app_custom_icons').all() as {
-      app_name: string
-      icon_data: string
-    }[]
+  ipcMain.handle('get-custom-icons', async () => {
+    const { join } = require('path')
+    const { promises: fs } = require('fs')
+    const ICON_CACHE_PATH = join(app.getPath('userData'), 'icon-cache')
+    
     const result: Record<string, string> = {}
-    for (const row of rows) {
-      result[row.app_name] = row.icon_data
+    try {
+      const files = await fs.readdir(ICON_CACHE_PATH)
+      for (const file of files) {
+        if (file.endsWith('.png')) {
+          const appName = file.replace('.png', '')
+          result[appName] = `file:///${join(ICON_CACHE_PATH, file).replace(/\\/g, '/')}`
+        }
+      }
+    } catch (err) {
+      // Directory might not exist yet
     }
     return result
+  })
+
+  // ── Scenery Background Image ──────────────────────────────────
+  ipcMain.handle('get-background-image', () => {
+    const fs = require('fs')
+    const { join } = require('path')
+    
+    let imagePath = join(app.getAppPath(), 'src/main/utils/draw1.webp')
+    if (!fs.existsSync(imagePath)) {
+      imagePath = join(__dirname, '../../src/main/utils/draw1.webp')
+    }
+    if (!fs.existsSync(imagePath)) {
+      imagePath = join(__dirname, 'utils/draw1.webp')
+    }
+    if (!fs.existsSync(imagePath)) {
+      imagePath = join(__dirname, '../src/main/utils/draw1.webp')
+    }
+    if (!fs.existsSync(imagePath)) {
+      imagePath = join(__dirname, 'draw1.webp')
+    }
+
+    if (!fs.existsSync(imagePath)) {
+      console.warn('[ipc-handlers] draw1.webp not found at path: ', imagePath)
+      return null
+    }
+
+    try {
+      const buffer = fs.readFileSync(imagePath)
+      return `data:image/webp;base64,${buffer.toString('base64')}`
+    } catch (err) {
+      console.error('[ipc-handlers] Failed to read background scenery:', err)
+      return null
+    }
   })
 
   ipcMain.handle('select-and-set-app-icon', async (_event, appName: string) => {

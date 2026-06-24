@@ -5,7 +5,7 @@ import { CATEGORY_COLORS, CATEGORY_ICONS } from '../../lib/constants'
 import { CategoryBadge } from '../ui/CategoryBadge'
 
 export function AppUsageList() {
-  const { todaySessions, totalActiveSeconds } = useTrackingStore()
+  const { todaySessions, totalActiveSeconds, customIcons } = useTrackingStore()
 
   if (todaySessions.length === 0) {
     return (
@@ -34,10 +34,18 @@ export function AppUsageList() {
           >
             {/* App icon */}
             <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0"
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0 overflow-hidden"
               style={{ backgroundColor: `${color}15` }}
             >
-              {icon}
+              {customIcons?.[session.app_name] ? (
+                <img
+                  src={customIcons[session.app_name]}
+                  alt={session.app_name}
+                  className="w-6 h-6 object-contain"
+                />
+              ) : (
+                icon
+              )}
             </div>
 
             {/* App info */}

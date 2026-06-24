@@ -120,15 +120,15 @@ function createWindow(): BrowserWindow {
   const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().workAreaSize
 
   mainWindow = new BrowserWindow({
-    width: 360,
-    height: 280,
-    x: screenWidth - 380,
-    y: screenHeight - 300,
+    width: 340,
+    height: 720,
+    x: screenWidth - 360,
+    y: screenHeight - 740,
     frame: false,
     transparent: true,
     alwaysOnTop: false,
     skipTaskbar: false,
-    resizable: true,
+    resizable: false,
     minimizable: true,
     maximizable: false,
     hasShadow: false,
@@ -142,7 +142,7 @@ function createWindow(): BrowserWindow {
     }
   })
 
-  mainWindow.setMinimumSize(300, 200)
+  // mainWindow.setMinimumSize(300, 200) removed since resizable is false
 
   mainWindow.on('ready-to-show', () => {
     mainWindow?.show()
@@ -223,9 +223,9 @@ app.whenReady().then(() => {
   ipcMain.on('window-toggle-expand', (_event, expanded: boolean) => {
     if (mainWindow) {
       if (expanded) {
-        mainWindow.setSize(400, 600, true)
+        mainWindow.setSize(340, 720, true)
       } else {
-        mainWindow.setSize(360, 280, true)
+        mainWindow.setSize(340, 110, true)
       }
     }
   })

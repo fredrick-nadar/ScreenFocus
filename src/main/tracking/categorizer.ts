@@ -1,72 +1,56 @@
 import { getDb } from '../database/db'
 
-type Category = 'Coding' | 'Learning' | 'Communication' | 'Entertainment' | 'Gaming' | 'Uncategorized'
+type Category = 'editor' | 'browser' | 'ai' | 'os' | 'terminal' | 'design' | 'comms' | 'default'
 
 // Default app → category mappings (matched by lowercase process name substring)
 const DEFAULT_CATEGORIES: Record<Category, string[]> = {
-  Coding: [
+  editor: [
     'code', 'vscode', 'visual studio', 'intellij', 'idea64', 'webstorm', 'pycharm',
     'cursor', 'sublime', 'atom', 'notepad++', 'vim', 'nvim', 'neovim',
-    'terminal', 'windowsterminal', 'wt', 'powershell', 'cmd', 'bash', 'wsl',
-    'github desktop', 'gitkraken', 'sourcetree', 'postman', 'insomnia',
     'android studio', 'xcode', 'eclipse', 'netbeans', 'rider', 'datagrip',
-    'docker', 'figma', 'antigravity', 'zed', 'fleet', 'lapce'
+    'zed', 'fleet', 'lapce'
   ],
-  Learning: [
-    'leetcode', 'hackerrank', 'codeforces', 'codechef',
-    'chatgpt', 'claude', 'bard', 'copilot',
-    'coursera', 'udemy', 'edx', 'khan academy', 'pluralsight',
-    'notion', 'obsidian', 'anki',
-    'adobe reader', 'foxit', 'sumatra'
+  browser: [
+    'chrome', 'firefox', 'edge', 'msedge', 'brave', 'opera', 'vivaldi', 'arc', 'safari'
   ],
-  Communication: [
+  ai: [
+    'chatgpt', 'claude', 'bard', 'copilot'
+  ],
+  comms: [
     'discord', 'slack', 'teams', 'zoom', 'skype',
-    'telegram', 'whatsapp', 'signal', 'thunderbird',
-    'outlook', 'gmail', 'mail'
+    'telegram', 'whatsapp', 'signal', 'outlook', 'thunderbird', 'gmail', 'mail'
   ],
-  Entertainment: [
-    'spotify', 'netflix', 'primevideo', 'amazon prime',
-    'youtube', 'twitch', 'vlc', 'mpv', 'media player',
-    'plex', 'disney', 'hbo', 'hulu',
-    'reddit', 'twitter', 'instagram', 'tiktok', 'facebook'
+  os: [
+    'explorer', 'finder', 'control panel', 'settings', 'taskmgr'
   ],
-  Gaming: [
-    'valorant', 'steam', 'steamwebhelper', 'epicgames', 'epicgameslauncher',
-    'riotclient', 'leagueclient', 'minecraft', 'fortnite',
-    'csgo', 'cs2', 'dota2', 'apex', 'overwatch',
-    'gta', 'roblox', 'battle.net', 'origin', 'ea app',
-    'xbox', 'playnite', 'gog'
+  terminal: [
+    'terminal', 'windowsterminal', 'wt', 'powershell', 'cmd', 'bash', 'wsl'
   ],
-  Uncategorized: []
+  design: [
+    'figma', 'photoshop', 'illustrator', 'xd', 'sketch', 'affinity'
+  ],
+  default: []
 }
 
 // Window title keywords for browser tab classification
 const BROWSER_TITLE_KEYWORDS: Record<Category, string[]> = {
-  Coding: [
+  editor: [
     'github', 'gitlab', 'bitbucket', 'stackoverflow', 'stack overflow',
     'codepen', 'codesandbox', 'replit', 'jsfiddle',
     'npm', 'docs', 'documentation', 'api reference', 'developer',
     'mdn', 'w3schools', 'devtools'
   ],
-  Learning: [
-    'leetcode', 'hackerrank', 'codeforces', 'codechef', 'geeksforgeeks',
-    'coursera', 'udemy', 'edx', 'khan academy',
-    'chatgpt', 'claude', 'bard', 'perplexity',
-    'tutorial', 'course', 'lecture', 'learn'
+  browser: [],
+  ai: [
+    'chatgpt', 'claude', 'bard', 'perplexity'
   ],
-  Communication: [
-    'gmail', 'outlook', 'mail', 'slack', 'discord',
-    'teams', 'zoom', 'meet.google'
+  comms: [
+    'slack', 'discord', 'teams', 'zoom', 'meet.google', 'gmail', 'outlook', 'mail'
   ],
-  Entertainment: [
-    'youtube', 'netflix', 'twitch', 'reddit', 'twitter',
-    'instagram', 'facebook', 'tiktok', 'spotify',
-    'prime video', 'disney+', 'hulu'
-  ],
-  Gaming: [
-    'steam', 'epic games', 'game', 'gaming'
-  ],
-  Uncategorized: []
+  os: [],
+  terminal: [],
+  design: ['figma'],
+  default: []
 }
 
 // Browsers list for title-based categorization
@@ -84,14 +68,14 @@ export function categorizeApp(processName: string, windowTitle: string): Categor
     return override.category
   }
 
-  // 2. No automatic/upfront categorization - default to Uncategorized
-  return 'Uncategorized'
+  // 2. No automatic/upfront categorization - default to default
+  return 'default'
 }
 
 function categorizeBrowserTitle(title: string): Category {
   // Check each category's title keywords
   for (const [category, keywords] of Object.entries(BROWSER_TITLE_KEYWORDS)) {
-    if (category === 'Uncategorized') continue
+    if (category === 'default') continue
     for (const keyword of keywords) {
       if (title.includes(keyword)) {
         return category as Category
@@ -99,7 +83,7 @@ function categorizeBrowserTitle(title: string): Category {
     }
   }
 
-  return 'Uncategorized'
+  return 'default'
 }
 
 export function setCategoryOverride(appName: string, category: string): void {
@@ -122,5 +106,14 @@ export function getCategoryOverrides(): Record<string, string> {
 }
 
 export function getAllCategories(): string[] {
-  return ['Coding', 'Learning', 'Communication', 'Entertainment', 'Gaming', 'Uncategorized']
+  return [
+    'editor',
+    'browser',
+    'ai',
+    'os',
+    'terminal',
+    'design',
+    'comms',
+    'default'
+  ]
 }

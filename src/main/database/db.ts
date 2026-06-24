@@ -20,6 +20,8 @@ export function getDb(): Database.Database {
   return db
 }
 
+import { migrateCategoryRename } from './migrations/002_category_rename'
+
 export function initDatabase(): void {
   const dbPath = getDbPath()
   db = new Database(dbPath)
@@ -31,6 +33,9 @@ export function initDatabase(): void {
 
   // Run migrations
   runMigrations(db)
+  
+  // Custom script migrations
+  migrateCategoryRename(db)
 }
 
 function runMigrations(db: Database.Database): void {
@@ -87,20 +92,20 @@ function runMigrations(db: Database.Database): void {
     );
   `)
 
-  // Insert default settings if they don't exist
+  // Force new default settings since the settings tab is removed
   const insertSetting = db.prepare(
-    'INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)'
+    'INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)'
   )
 
   const defaults: [string, string][] = [
-    ['idle_threshold_minutes', '5'],
+    ['idle_threshold_minutes', '1'],
     ['polling_interval_ms', '1000'],
     ['always_on_top', 'false'],
-    ['start_with_windows', 'false'],
+    ['start_with_windows', 'true'],
     ['widget_opacity', '1.0'],
     ['widget_mode', 'compact'],
     ['tracking_paused', 'false'],
-    ['auto_hide', 'false']
+    ['auto_hide', 'true']
   ]
 
   const insertMany = db.transaction(() => {

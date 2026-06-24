@@ -3,10 +3,12 @@ import { insertSession } from '../database/sessions'
 import { categorizeApp } from './categorizer'
 import { IdleDetector } from './idle-detector'
 import { aggregateAndSaveTodayStats } from '../database/daily-stats'
+import { getDb } from '../database/db'
 
 interface ActiveWindowInfo {
   appName: string
   windowTitle: string
+  path: string
 }
 
 interface CurrentSession {
@@ -205,7 +207,7 @@ export class TrackingService {
 
       if (!windowInfo || !windowInfo.appName) return
 
-      let { appName, windowTitle } = windowInfo
+      let { appName, windowTitle, path } = windowInfo
 
       // Log first few polls for debugging
       if (this.pollCount < 5) {
@@ -236,6 +238,17 @@ export class TrackingService {
       }
 
       const category = categorizeApp(appName, windowTitle)
+
+      // Dynamically extract native system icon with file-based cache invalidation
+      if (path && path.length > 0) {
+        import('../utils/iconResolver').then(({ resolveIcon }) => {
+          resolveIcon(path).then((iconUrl) => {
+            if (iconUrl && this.win && !this.win.isDestroyed()) {
+              this.win.webContents.send('custom-icons-updated', { [appName]: iconUrl })
+            }
+          })
+        }).catch(() => {})
+      }
 
       this.currentSession = {
         appName,
@@ -295,7 +308,10 @@ $p = [uint32]0
 $proc = Get-Process -Id $p -ErrorAction SilentlyContinue
 $sb = New-Object System.Text.StringBuilder 256
 [FgWin]::GetWindowText($h, $sb, 256) | Out-Null
-$result = @{ ProcessName = $proc.ProcessName; MainWindowTitle = $sb.ToString() }
+$path = ""
+try { $path = $proc.Path } catch {}
+if (-not $path) { try { $path = $proc.MainModule.FileName } catch {} }
+$result = @{ ProcessName = $proc.ProcessName; MainWindowTitle = $sb.ToString(); Path = $path }
 $result | ConvertTo-Json -Compress
 `
     writeFileSync(this.psScriptPath, script, 'utf8')
@@ -324,7 +340,8 @@ $result | ConvertTo-Json -Compress
             }
             resolve({
               appName: data.ProcessName,
-              windowTitle: data.MainWindowTitle || ''
+              windowTitle: data.MainWindowTitle || '',
+              path: data.Path || ''
             })
           } catch {
             resolve(null)

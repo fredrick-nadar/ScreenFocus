@@ -20,6 +20,7 @@ export interface ElectronAPI {
   getCustomIcons: () => Promise<Record<string, string>>
   selectAndSetAppIcon: (appName: string) => Promise<string | null>
   deleteCustomIcon: (appName: string) => Promise<boolean>
+  getBackgroundImage: () => Promise<string | null>
 
   // Mutations
   upsertGoal: (goal: any) => Promise<number>
@@ -38,6 +39,7 @@ export interface ElectronAPI {
   // Event listeners
   onTrackingUpdate: (callback: (data: any) => void) => () => void
   onTrackingStatusChanged: (callback: (data: { isPaused: boolean }) => void) => () => void
+  onCustomIconsUpdated: (callback: (data: Record<string, string>) => void) => () => void
 }
 
 const api: ElectronAPI = {
@@ -60,6 +62,7 @@ const api: ElectronAPI = {
   getCustomIcons: () => ipcRenderer.invoke('get-custom-icons'),
   selectAndSetAppIcon: (appName) => ipcRenderer.invoke('select-and-set-app-icon', appName),
   deleteCustomIcon: (appName) => ipcRenderer.invoke('delete-custom-icon', appName),
+  getBackgroundImage: () => ipcRenderer.invoke('get-background-image'),
 
   // Mutations
   upsertGoal: (goal) => ipcRenderer.invoke('upsert-goal', goal),
@@ -86,6 +89,11 @@ const api: ElectronAPI = {
     const handler = (_event: any, data: { isPaused: boolean }): void => callback(data)
     ipcRenderer.on('tracking-status-changed', handler)
     return () => ipcRenderer.removeListener('tracking-status-changed', handler)
+  },
+  onCustomIconsUpdated: (callback) => {
+    const handler = (_event: any, data: Record<string, string>): void => callback(data)
+    ipcRenderer.on('custom-icons-updated', handler)
+    return () => ipcRenderer.removeListener('custom-icons-updated', handler)
   }
 }
 

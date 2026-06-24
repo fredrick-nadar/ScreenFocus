@@ -76,18 +76,22 @@ export function registerIpcHandlers(trackingService: TrackingService): void {
     return true
   })
 
-  // ── Settings ───────────────────────────────────────────────────
+  // ── Icons ──────────────────────────────────────────────────────
+  ipcMain.handle('get-custom-icons', () => {
+    const db = getDb()
+    const rows = db.prepare('SELECT app_name, icon_data FROM app_custom_icons').all() as { app_name: string; icon_data: string }[]
+    const map: Record<string, string> = {}
+    for (const r of rows) map[r.app_name] = r.icon_data
+    return map
+  })
+
+  // ── Settings & Background ──────────────────────────────────────
   ipcMain.handle('get-settings', () => {
     const db = getDb()
-    const rows = db.prepare('SELECT key, value FROM settings').all() as {
-      key: string
-      value: string
-    }[]
-    const result: Record<string, string> = {}
-    for (const row of rows) {
-      result[row.key] = row.value
-    }
-    return result
+    const rows = db.prepare('SELECT key, value FROM settings').all() as { key: string; value: string }[]
+    const map: Record<string, string> = {}
+    for (const r of rows) map[r.key] = r.value
+    return map
   })
 
   ipcMain.handle('set-setting', (_event, key: string, value: string) => {
@@ -102,6 +106,34 @@ export function registerIpcHandlers(trackingService: TrackingService): void {
     }
 
     return true
+  })
+
+  ipcMain.handle('get-background-image', () => {
+    const db = getDb()
+    const row = db.prepare('SELECT value FROM settings WHERE key = ?').get('custom_background') as { value: string } | undefined
+    return row ? row.value : null
+  })
+
+  ipcMain.handle('select-and-set-background-image', async () => {
+    const { dialog } = require('electron')
+    const result = await dialog.showOpenDialog({
+      properties: ['openFile'],
+      filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif', 'webp'] }]
+    })
+
+    if (!result.canceled && result.filePaths.length > 0) {
+      const fs = require('fs')
+      const filePath = result.filePaths[0]
+      const ext = filePath.split('.').pop()?.toLowerCase() || 'png'
+      const base64 = fs.readFileSync(filePath, 'base64')
+      const dataUrl = `data:image/${ext};base64,${base64}`
+
+      const db = getDb()
+      db.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)').run('custom_background', dataUrl)
+
+      return dataUrl
+    }
+    return null
   })
 
   // ── Tracking Control ───────────────────────────────────────────

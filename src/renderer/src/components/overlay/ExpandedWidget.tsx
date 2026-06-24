@@ -2,10 +2,10 @@ import { motion } from 'framer-motion'
 import { useTrackingStore } from '../../stores/tracking-store'
 import { useSettingsStore } from '../../stores/settings-store'
 import { formatDuration } from '../../lib/formatters'
-import { CATEGORY_COLORS, CATEGORY_ICONS } from '../../lib/constants'
+import { CATEGORY_COLORS } from '../../lib/constants'
 import { AnimatedNumber } from '../ui/AnimatedNumber'
-import { FocusRings } from './FocusRings'
 import { ProductivityScore } from '../dashboard/ProductivityScore'
+import { AppIcon } from '../ui/AppIcon'
 
 export function ExpandedWidget() {
   const { todaySessions, todayStats, totalActiveSeconds, currentApp, isIdle, isPaused, systemInfo } =
@@ -87,27 +87,22 @@ export function ExpandedWidget() {
       </motion.div>
 
       {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto px-5 pb-4 space-y-3 relative z-10">
-        {/* Focus Rings */}
-        <div className="py-1">
-          <FocusRings />
-        </div>
-
+      <div className="flex-1 overflow-y-auto px-5 pb-4 space-y-4 relative z-10 scrollbar-none">
         {/* Productivity */}
         <ProductivityScore />
 
         {/* App Usage List */}
         <div>
-          <h3 className="text-[9px] font-semibold text-white/25 uppercase tracking-[0.12em] mb-2">
+          <h3 className="text-[9px] font-semibold text-white/25 uppercase tracking-[0.12em] mb-2.5">
             App Usage
           </h3>
-          <div className="space-y-0.5">
+          <div className="space-y-1">
             {todaySessions.length === 0 ? (
               <div className="text-center py-4">
                 <span className="text-[10px] text-white/15">No app usage yet</span>
               </div>
             ) : (
-              todaySessions.slice(0, 8).map((session, i) => (
+              todaySessions.slice(0, 10).map((session, i) => (
                 <AppUsageRow
                   key={session.app_name}
                   appName={session.app_name}
@@ -140,30 +135,32 @@ function AppUsageRow({
 }) {
   const percentage = totalSeconds > 0 ? (seconds / totalSeconds) * 100 : 0
   const color = CATEGORY_COLORS[category] || '#64748b'
-  const icon = CATEGORY_ICONS[category] || '📁'
 
   return (
     <motion.div
       initial={{ opacity: 0, x: -8 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.1 + index * 0.03 }}
-      className="flex items-center gap-2 py-1.5 px-2 rounded-xl hover:bg-white/[0.02] transition-colors group"
+      className="flex items-center gap-3 py-1 px-2 rounded-xl hover:bg-white/[0.02] transition-colors group cursor-help"
+      title={`${appName} (${formatDuration(seconds)})`}
     >
-      <span className="text-xs w-5 text-center opacity-60 group-hover:opacity-90 transition-opacity">{icon}</span>
+      <AppIcon appName={appName} className="w-8 h-8" />
       <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between mb-0.5">
-          <span className="text-[10px] font-medium text-white/60 truncate">{appName}</span>
-          <span className="text-[10px] font-semibold text-white/45 ml-2 shrink-0 tabular-nums">
+        <div className="flex items-center justify-between mb-1.5">
+          <span className="text-[10px] font-semibold text-white/70 tabular-nums">
             {formatDuration(seconds)}
           </span>
+          <span className="text-[9px] text-white/20 uppercase tracking-wider font-semibold">
+            {Math.round(percentage)}%
+          </span>
         </div>
-        <div className="progress-bar">
+        <div className="progress-bar rounded-full" style={{ height: 6, background: 'rgba(255, 255, 255, 0.06)' }}>
           <motion.div
-            className="progress-bar-fill"
+            className="progress-bar-fill rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${Math.min(percentage, 100)}%` }}
             transition={{ duration: 0.6, delay: 0.2 + index * 0.03 }}
-            style={{ backgroundColor: color, opacity: 0.7 }}
+            style={{ backgroundColor: color, opacity: 0.8, borderRadius: 999 }}
           />
         </div>
       </div>

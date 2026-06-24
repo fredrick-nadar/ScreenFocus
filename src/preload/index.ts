@@ -17,6 +17,9 @@ export interface ElectronAPI {
   getTrackingStatus: () => Promise<{ isPaused: boolean }>
   getSystemInfo: () => Promise<{ uptimeSeconds: number; idleSeconds: number; onTodaySeconds: number; bootTimestamp: number }>
   getWindowSize: () => Promise<[number, number]>
+  getCustomIcons: () => Promise<Record<string, string>>
+  selectAndSetAppIcon: (appName: string) => Promise<string | null>
+  deleteCustomIcon: (appName: string) => Promise<boolean>
 
   // Mutations
   upsertGoal: (goal: any) => Promise<number>
@@ -54,6 +57,9 @@ const api: ElectronAPI = {
   getTrackingStatus: () => ipcRenderer.invoke('get-tracking-status'),
   getSystemInfo: () => ipcRenderer.invoke('get-system-info'),
   getWindowSize: () => ipcRenderer.invoke('get-window-size'),
+  getCustomIcons: () => ipcRenderer.invoke('get-custom-icons'),
+  selectAndSetAppIcon: (appName) => ipcRenderer.invoke('select-and-set-app-icon', appName),
+  deleteCustomIcon: (appName) => ipcRenderer.invoke('delete-custom-icon', appName),
 
   // Mutations
   upsertGoal: (goal) => ipcRenderer.invoke('upsert-goal', goal),

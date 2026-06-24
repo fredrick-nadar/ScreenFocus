@@ -80,6 +80,9 @@ interface TrackingState {
   streaks: StreakInfo[]
   insights: Insight[]
 
+  // Custom icons
+  customIcons: Record<string, string>
+
   // System info
   systemInfo: SystemInfo | null
 
@@ -94,6 +97,9 @@ interface TrackingState {
   fetchStreaks: () => Promise<void>
   fetchInsights: () => Promise<void>
   fetchSystemInfo: () => Promise<void>
+  fetchCustomIcons: () => Promise<void>
+  selectAndSetIcon: (appName: string) => Promise<void>
+  deleteCustomIcon: (appName: string) => Promise<void>
   handleTrackingUpdate: (data: TrackingUpdate) => void
   toggleTracking: () => Promise<void>
 }
@@ -114,6 +120,8 @@ export const useTrackingStore = create<TrackingState>((set, get) => ({
   streaks: [],
   insights: [],
 
+  customIcons: {},
+
   systemInfo: null,
 
   isLoading: true,
@@ -126,7 +134,8 @@ export const useTrackingStore = create<TrackingState>((set, get) => ({
       get().fetchGoals(),
       get().fetchStreaks(),
       get().fetchInsights(),
-      get().fetchSystemInfo()
+      get().fetchSystemInfo(),
+      get().fetchCustomIcons()
     ])
     set({ isLoading: false })
   },
@@ -192,6 +201,41 @@ export const useTrackingStore = create<TrackingState>((set, get) => ({
       set({ systemInfo })
     } catch (err) {
       console.error('Failed to fetch system info:', err)
+    }
+  },
+
+  fetchCustomIcons: async () => {
+    try {
+      const customIcons = await api().getCustomIcons()
+      set({ customIcons })
+    } catch (err) {
+      console.error('Failed to fetch custom icons:', err)
+    }
+  },
+
+  selectAndSetIcon: async (appName: string) => {
+    try {
+      const dataUrl = await api().selectAndSetAppIcon(appName)
+      if (dataUrl) {
+        set((state) => ({
+          customIcons: { ...state.customIcons, [appName]: dataUrl }
+        }))
+      }
+    } catch (err) {
+      console.error('Failed to set app icon:', err)
+    }
+  },
+
+  deleteCustomIcon: async (appName: string) => {
+    try {
+      await api().deleteCustomIcon(appName)
+      set((state) => {
+        const next = { ...state.customIcons }
+        delete next[appName]
+        return { customIcons: next }
+      })
+    } catch (err) {
+      console.error('Failed to delete custom icon:', err)
     }
   },
 

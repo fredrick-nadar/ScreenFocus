@@ -136,4 +136,52 @@ export function registerIpcHandlers(trackingService: TrackingService): void {
       bootTimestamp: bootTime  // When the system was booted
     }
   })
+
+  // ── Custom App Icons ──────────────────────────────────────────
+  ipcMain.handle('get-custom-icons', () => {
+    const db = getDb()
+    const rows = db.prepare('SELECT app_name, icon_data FROM app_custom_icons').all() as {
+      app_name: string
+      icon_data: string
+    }[]
+    const result: Record<string, string> = {}
+    for (const row of rows) {
+      result[row.app_name] = row.icon_data
+    }
+    return result
+  })
+
+  ipcMain.handle('select-and-set-app-icon', async (_event, appName: string) => {
+    const { dialog } = require('electron')
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      title: `Select icon for ${appName}`,
+      filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'svg', 'webp'] }],
+      properties: ['openFile']
+    })
+
+    if (canceled || filePaths.length === 0) return null
+
+    try {
+      const fs = require('fs')
+      const path = filePaths[0]
+      const buffer = fs.readFileSync(path)
+      const ext = path.split('.').pop()
+      const base64 = buffer.toString('base64')
+      const dataUrl = `data:image/${ext};base64,${base64}`
+
+      const db = getDb()
+      db.prepare('INSERT OR REPLACE INTO app_custom_icons (app_name, icon_data) VALUES (?, ?)').run(appName, dataUrl)
+
+      return dataUrl
+    } catch (err) {
+      console.error('[ipc-handlers] Failed to read/set app icon:', err)
+      return null
+    }
+  })
+
+  ipcMain.handle('delete-custom-icon', (_event, appName: string) => {
+    const db = getDb()
+    db.prepare('DELETE FROM app_custom_icons WHERE app_name = ?').run(appName)
+    return true
+  })
 }

@@ -121,9 +121,9 @@ function createWindow(): BrowserWindow {
 
   mainWindow = new BrowserWindow({
     width: 360,
-    height: 440,
+    height: 280,
     x: screenWidth - 380,
-    y: screenHeight - 460,
+    y: screenHeight - 300,
     frame: false,
     transparent: true,
     alwaysOnTop: false,
@@ -225,7 +225,7 @@ app.whenReady().then(() => {
       if (expanded) {
         mainWindow.setSize(400, 600, true)
       } else {
-        mainWindow.setSize(360, 440, true)
+        mainWindow.setSize(360, 280, true)
       }
     }
   })
@@ -234,7 +234,7 @@ app.whenReady().then(() => {
     if (mainWindow) {
       return mainWindow.getSize()
     }
-    return [360, 440]
+    return [360, 280]
   })
 
   ipcMain.on('set-always-on-top', (_event, value: boolean) => {

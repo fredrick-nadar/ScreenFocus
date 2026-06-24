@@ -80,6 +80,11 @@ function runMigrations(db: Database.Database): void {
       key TEXT PRIMARY KEY,
       value TEXT
     );
+
+    CREATE TABLE IF NOT EXISTS app_custom_icons (
+      app_name TEXT PRIMARY KEY,
+      icon_data TEXT NOT NULL
+    );
   `)
 
   // Insert default settings if they don't exist

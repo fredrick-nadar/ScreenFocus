@@ -5,6 +5,7 @@ import { AppCategory, TimeOfDay } from '../scenes'
 import { formatDuration } from '../lib/formatters'
 import { useTrackingStore } from '../stores/tracking-store'
 import { HistoryView } from './HistoryView'
+import { DashboardView } from './DashboardView'
 
 export interface WidgetApp {
   exeName: string
@@ -33,7 +34,7 @@ interface WidgetProps {
 
 export const Widget: React.FC<WidgetProps> = ({ data, timeOfDay, isExpanded, onToggleExpand }) => {
   const shouldReduceMotion = useReducedMotion()
-  const [currentView, setCurrentView] = useState<'focus' | 'history'>('focus')
+  const [currentView, setCurrentView] = useState<'focus' | 'history' | 'dashboard'>('focus')
   
   // Format times nicely (e.g. 32m, 1h 4m)
   const formatMins = (mins: number) => {
@@ -104,7 +105,7 @@ export const Widget: React.FC<WidgetProps> = ({ data, timeOfDay, isExpanded, onT
       {isExpanded && (
         <div className="flex-1 overflow-hidden flex flex-col h-full relative z-10">
           <AnimatePresence mode="wait">
-            {currentView === 'focus' ? (
+            {currentView === 'focus' && (
               <motion.div 
                 key="focus"
                 initial={{ opacity: 0 }}
@@ -147,7 +148,9 @@ export const Widget: React.FC<WidgetProps> = ({ data, timeOfDay, isExpanded, onT
                   </div>
                 )}
               </motion.div>
-            ) : (
+            )}
+            
+            {currentView === 'history' && (
               <motion.div 
                 key="history"
                 initial={{ opacity: 0 }}
@@ -156,6 +159,18 @@ export const Widget: React.FC<WidgetProps> = ({ data, timeOfDay, isExpanded, onT
                 className="h-full overflow-y-auto"
               >
                 <HistoryView />
+              </motion.div>
+            )}
+
+            {currentView === 'dashboard' && (
+              <motion.div 
+                key="dashboard"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="h-full overflow-hidden"
+              >
+                <DashboardView />
               </motion.div>
             )}
           </AnimatePresence>
@@ -173,7 +188,36 @@ export const Widget: React.FC<WidgetProps> = ({ data, timeOfDay, isExpanded, onT
           </div>
 
           <button 
-            onClick={() => setCurrentView(currentView === 'focus' ? 'history' : 'focus')}
+            onClick={() => {
+              if (currentView === 'dashboard' && isExpanded) {
+                setCurrentView('focus')
+              } else {
+                setCurrentView('dashboard')
+                if (!isExpanded) onToggleExpand()
+              }
+            }}
+            title="Toggle Dashboard"
+            style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px', opacity: currentView === 'dashboard' ? 1 : 0.5, transition: 'opacity 0.2s' }}
+            onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+            onMouseLeave={(e) => { if (currentView !== 'dashboard') e.currentTarget.style.opacity = '0.5' }}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#fff' }}>
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+            </svg>
+          </button>
+
+          <button 
+            onClick={() => {
+              if (currentView === 'history' && isExpanded) {
+                setCurrentView('focus')
+              } else {
+                setCurrentView('history')
+                if (!isExpanded) onToggleExpand()
+              }
+            }}
             title="Toggle History"
             style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px', opacity: currentView === 'history' ? 1 : 0.5, transition: 'opacity 0.2s' }}
             onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}

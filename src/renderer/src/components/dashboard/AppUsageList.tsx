@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { useTrackingStore } from '../../stores/tracking-store'
 import { formatDuration } from '../../lib/formatters'
-import { CATEGORY_COLORS, CATEGORY_ICONS } from '../../lib/constants'
+import { DASHBOARD_COLORS, CATEGORY_ICONS } from '../../lib/constants'
 import { CategoryBadge } from '../ui/CategoryBadge'
 
 export function AppUsageList() {
@@ -21,7 +21,7 @@ export function AppUsageList() {
     <div className="space-y-1">
       {todaySessions.map((session, i) => {
         const pct = totalActiveSeconds > 0 ? (session.total_seconds / totalActiveSeconds) * 100 : 0
-        const color = CATEGORY_COLORS[session.category] || '#94a3b8'
+        const color = DASHBOARD_COLORS[session.category] || '#94a3b8'
         const icon = CATEGORY_ICONS[session.category] || '📁'
 
         return (

@@ -7,9 +7,10 @@ import { AppCategory } from '../scenes'
 export function HistoryView() {
   const { weeklyStats, historySessions, fetchSessionsForDate } = useTrackingStore()
   
-  // Default to today
+  // Default to today using local timezone, not UTC
   const [selectedDate, setSelectedDate] = useState(() => {
-    return new Date().toISOString().split('T')[0]
+    const d = new Date()
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
   })
 
   // Ensure sessions for the selected date are fetched
@@ -22,16 +23,18 @@ export function HistoryView() {
   const handlePrevDay = () => {
     const d = new Date(selectedDate)
     d.setDate(d.getDate() - 1)
-    setSelectedDate(d.toISOString().split('T')[0])
+    setSelectedDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`)
   }
 
   const handleNextDay = () => {
     const d = new Date(selectedDate)
     d.setDate(d.getDate() + 1)
     // Prevent going into the future
-    const today = new Date().toISOString().split('T')[0]
-    if (d.toISOString().split('T')[0] <= today) {
-      setSelectedDate(d.toISOString().split('T')[0])
+    const td = new Date()
+    const todayStr = `${td.getFullYear()}-${String(td.getMonth() + 1).padStart(2, '0')}-${String(td.getDate()).padStart(2, '0')}`
+    const nextStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    if (nextStr <= todayStr) {
+      setSelectedDate(nextStr)
     }
   }
 
@@ -40,7 +43,10 @@ export function HistoryView() {
     return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
   }
 
-  const isToday = selectedDate === new Date().toISOString().split('T')[0]
+  const isToday = useMemo(() => {
+    const td = new Date()
+    return selectedDate === `${td.getFullYear()}-${String(td.getMonth() + 1).padStart(2, '0')}-${String(td.getDate()).padStart(2, '0')}`
+  }, [selectedDate])
 
   // Prepare chart data (last 7 days from weeklyStats)
   const chartData = useMemo(() => {
@@ -124,10 +130,13 @@ export function HistoryView() {
             {mappedApps.map((app, index) => (
               <SceneCard
                 key={app.exeName}
-                app={app}
-                isExpanded={false}
-                onToggle={() => {}}
-                style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '12px' }}
+                appName={app.displayName}
+                category={app.category}
+                minutes={app.minutes}
+                percentage={app.percentage}
+                isHero={false}
+                index={index}
+                timeOfDay="night" // Static or derived from context if you have it
               />
             ))}
           </div>

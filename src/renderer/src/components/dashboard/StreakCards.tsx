@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { useTrackingStore } from '../../stores/tracking-store'
-import { CATEGORY_COLORS } from '../../lib/constants'
+import { DASHBOARD_COLORS } from '../../lib/constants'
 
 export function StreakCards() {
   const { streaks } = useTrackingStore()
@@ -22,7 +22,7 @@ export function StreakCards() {
       </h3>
       <div className="flex gap-2 overflow-x-auto pb-1">
         {activeStreaks.map((streak, i) => {
-          const color = CATEGORY_COLORS[streak.category] || '#94a3b8'
+          const color = DASHBOARD_COLORS[streak.category] || '#94a3b8'
           return (
             <motion.div
               key={streak.category}

@@ -1,4 +1,4 @@
-import { CATEGORY_COLORS, CATEGORY_ICONS } from '../../lib/constants'
+import { DASHBOARD_COLORS, CATEGORY_ICONS } from '../../lib/constants'
 
 interface CategoryBadgeProps {
   category: string
@@ -7,7 +7,7 @@ interface CategoryBadgeProps {
 }
 
 export function CategoryBadge({ category, size = 'sm', showIcon = true }: CategoryBadgeProps) {
-  const color = CATEGORY_COLORS[category] || '#94a3b8'
+  const color = DASHBOARD_COLORS[category] || '#94a3b8'
   const icon = CATEGORY_ICONS[category] || '📁'
 
   const sizeClasses = size === 'sm' ? 'text-[10px] px-2 py-0.5' : 'text-xs px-2.5 py-1'

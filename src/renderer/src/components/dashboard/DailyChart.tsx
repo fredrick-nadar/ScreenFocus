@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { useTrackingStore } from '../../stores/tracking-store'
 import { getDayLabel } from '../../lib/formatters'
-import { CATEGORY_COLORS } from '../../lib/constants'
+import { DASHBOARD_COLORS } from '../../lib/constants'
 
 export function DailyChart() {
   const { weeklyStats } = useTrackingStore()
@@ -54,11 +54,11 @@ export function DailyChart() {
               formatter={(value: number) => [`${value}m`, undefined]}
               cursor={{ fill: 'rgba(255,255,255,0.03)' }}
             />
-            <Bar dataKey="Coding" stackId="a" fill={CATEGORY_COLORS.Coding} radius={[0, 0, 0, 0]} />
-            <Bar dataKey="Learning" stackId="a" fill={CATEGORY_COLORS.Learning} />
-            <Bar dataKey="Communication" stackId="a" fill={CATEGORY_COLORS.Communication} />
-            <Bar dataKey="Entertainment" stackId="a" fill={CATEGORY_COLORS.Entertainment} />
-            <Bar dataKey="Gaming" stackId="a" fill={CATEGORY_COLORS.Gaming} radius={[3, 3, 0, 0]} />
+            <Bar dataKey="Coding" stackId="a" fill={DASHBOARD_COLORS.Coding} radius={[0, 0, 0, 0]} />
+            <Bar dataKey="Learning" stackId="a" fill={DASHBOARD_COLORS.Learning} />
+            <Bar dataKey="Communication" stackId="a" fill={DASHBOARD_COLORS.Communication} />
+            <Bar dataKey="Entertainment" stackId="a" fill={DASHBOARD_COLORS.Entertainment} />
+            <Bar dataKey="Gaming" stackId="a" fill={DASHBOARD_COLORS.Gaming} radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

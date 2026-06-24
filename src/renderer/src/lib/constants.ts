@@ -45,3 +45,35 @@ export const ALL_CATEGORIES = [
 // ── Day Names ─────────────────────────────────────────────────
 export const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const
 export const DAY_NAMES_SHORT = ['S', 'M', 'T', 'W', 'T', 'F', 'S'] as const
+
+export const DASHBOARD_COLORS: Record<string, string> = {
+  Coding: '#a78bfa',
+  Learning: '#6ee7b7',
+  Communication: '#60a5fa',
+  Entertainment: '#fbbf24',
+  Gaming: '#f472b6',
+  'Code editors / IDEs': '#85B7EB',
+  'Browsers': '#EF9F27',
+  'AI / Chat tools': '#5DCAA5',
+  'OS / System utilities': '#AFA9EC',
+  'Terminals / Shells': '#888780',
+  'Design tools': '#ED93B1',
+  'Productivity / Docs': '#97C459',
+  'Uncategorized': '#5F5E5A'
+}
+
+export const CATEGORY_ICONS: Record<string, string> = {
+  Coding: '💻',
+  Learning: '📚',
+  Communication: '💬',
+  Entertainment: '🍿',
+  Gaming: '🎮',
+  'Code editors / IDEs': '💻',
+  'Browsers': '🌐',
+  'AI / Chat tools': '🤖',
+  'OS / System utilities': '⚙️',
+  'Terminals / Shells': '⌨️',
+  'Design tools': '🎨',
+  'Productivity / Docs': '📄',
+  'Uncategorized': '📁'
+}

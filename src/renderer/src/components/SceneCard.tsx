@@ -41,7 +41,7 @@ export const SceneCard: React.FC<SceneCardProps> = ({
   const dominoes = Array.from({ length: 5 })
 
   // Layout values
-  const height = isHero ? 88 : 76
+  const height = isHero ? 120 : 112
   const textColor = isLightScene ? '#1a1a1a' : '#fff'
   const timeColor = isLightScene ? '#222222' : '#fff'
   const secondaryColor = isLightScene ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)'
@@ -49,12 +49,12 @@ export const SceneCard: React.FC<SceneCardProps> = ({
   // Animation variants
   const cardVariants = {
     hidden: { opacity: 0, y: 4 },
-    visible: { 
-      opacity: 1, 
-      y: 0, 
-      transition: { 
-        duration: shouldReduceMotion ? 0 : 0.3, 
-        delay: shouldReduceMotion ? 0 : index * 0.04 
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: shouldReduceMotion ? 0 : 0.3,
+        delay: shouldReduceMotion ? 0 : index * 0.04
       }
     }
   }
@@ -65,7 +65,7 @@ export const SceneCard: React.FC<SceneCardProps> = ({
       const isLit = custom < litCount
       const baseHeight = isLit ? (custom + 1) * 4 + 6 : 4
       const finalHeight = isHero ? baseHeight * 1.5 : baseHeight
-      
+
       return {
         height: finalHeight,
         transition: {
@@ -88,7 +88,7 @@ export const SceneCard: React.FC<SceneCardProps> = ({
     >
       {/* Layer 1: Scene SVG */}
       <div className="absolute inset-0 pointer-events-none z-0">
-        <SceneSvg timeOfDay={timeOfDay} width={340} height={height} />
+        <SceneSvg timeOfDay={timeOfDay} width="100%" height="100%" />
       </div>
 
       {/* Layer 2: Text Overlay */}

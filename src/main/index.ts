@@ -128,7 +128,9 @@ function createWindow(): BrowserWindow {
     transparent: true,
     alwaysOnTop: false,
     skipTaskbar: false,
-    resizable: false,
+    resizable: true,
+    minWidth: 200,
+    minHeight: 110,
     minimizable: true,
     maximizable: false,
     hasShadow: false,
@@ -142,7 +144,7 @@ function createWindow(): BrowserWindow {
     }
   })
 
-  // mainWindow.setMinimumSize(300, 200) removed since resizable is false
+  mainWindow.setMinimumSize(200, 110)
 
   mainWindow.on('ready-to-show', () => {
     mainWindow?.show()
@@ -229,10 +231,11 @@ app.whenReady().then(() => {
 
   ipcMain.on('window-toggle-expand', (_event, expanded: boolean) => {
     if (mainWindow) {
+      const [width] = mainWindow.getSize()
       if (expanded) {
-        mainWindow.setSize(340, 720, true)
+        mainWindow.setSize(width, 720, true)
       } else {
-        mainWindow.setSize(340, 110, true)
+        mainWindow.setSize(width, 110, true)
       }
     }
   })

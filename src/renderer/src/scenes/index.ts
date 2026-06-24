@@ -5,8 +5,8 @@ export type AppCategory = 'editor' | 'browser' | 'ai' | 'os' | 'terminal' | 'des
 
 export interface SceneProps {
   timeOfDay: TimeOfDay
-  width: number
-  height: number
+  width?: number | string
+  height?: number | string
 }
 
 import { EditorScene } from './EditorScene'

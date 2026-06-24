@@ -21,6 +21,7 @@ export interface ElectronAPI {
   selectAndSetAppIcon: (appName: string) => Promise<string | null>
   deleteCustomIcon: (appName: string) => Promise<boolean>
   getBackgroundImage: () => Promise<string | null>
+  selectAndSetBackgroundImage: () => Promise<string | null>
 
   // Mutations
   upsertGoal: (goal: any) => Promise<number>
@@ -63,6 +64,7 @@ const api: ElectronAPI = {
   selectAndSetAppIcon: (appName) => ipcRenderer.invoke('select-and-set-app-icon', appName),
   deleteCustomIcon: (appName) => ipcRenderer.invoke('delete-custom-icon', appName),
   getBackgroundImage: () => ipcRenderer.invoke('get-background-image'),
+  selectAndSetBackgroundImage: () => ipcRenderer.invoke('select-and-set-background-image'),
 
   // Mutations
   upsertGoal: (goal) => ipcRenderer.invoke('upsert-goal', goal),

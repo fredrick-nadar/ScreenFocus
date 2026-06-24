@@ -162,7 +162,17 @@ export function registerIpcHandlers(trackingService: TrackingService): void {
   ipcMain.handle('get-background-image', () => {
     const fs = require('fs')
     const { join } = require('path')
-    
+    const db = getDb()
+
+    try {
+      const row = db.prepare('SELECT value FROM settings WHERE key = ?').get('custom_background') as { value: string } | undefined
+      if (row && row.value && fs.existsSync(row.value)) {
+        return `file:///${row.value.replace(/\\/g, '/')}`
+      }
+    } catch (err) {
+      console.error('[ipc-handlers] Failed to read custom background from db:', err)
+    }
+
     let imagePath = join(app.getAppPath(), 'src/main/utils/draw1.webp')
     if (!fs.existsSync(imagePath)) {
       imagePath = join(__dirname, '../../src/main/utils/draw1.webp')
@@ -187,6 +197,41 @@ export function registerIpcHandlers(trackingService: TrackingService): void {
       return `data:image/webp;base64,${buffer.toString('base64')}`
     } catch (err) {
       console.error('[ipc-handlers] Failed to read background scenery:', err)
+      return null
+    }
+  })
+
+  ipcMain.handle('select-and-set-background-image', async () => {
+    const { dialog } = require('electron')
+    const fs = require('fs')
+    const { join } = require('path')
+
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      title: `Select Background Image`,
+      filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'webp'] }],
+      properties: ['openFile']
+    })
+
+    if (canceled || filePaths.length === 0) {
+      return null
+    }
+
+    try {
+      const sourcePath = filePaths[0]
+      const bgDir = join(app.getPath('userData'), 'backgrounds')
+      if (!fs.existsSync(bgDir)) {
+        fs.mkdirSync(bgDir, { recursive: true })
+      }
+
+      const destPath = join(bgDir, `custom_bg_${Date.now()}.${sourcePath.split('.').pop()}`)
+      fs.copyFileSync(sourcePath, destPath)
+
+      const db = getDb()
+      db.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)').run('custom_background', destPath)
+
+      return `file:///${destPath.replace(/\\/g, '/')}`
+    } catch (err) {
+      console.error('[ipc-handlers] Failed to set background image:', err)
       return null
     }
   })

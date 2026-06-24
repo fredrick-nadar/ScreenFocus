@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { SceneCard } from './SceneCard'
 import { AppCategory, TimeOfDay } from '../scenes'
 import { formatDuration } from '../lib/formatters'
+import { useTrackingStore } from '../stores/tracking-store'
 
 export interface WidgetApp {
   exeName: string
@@ -25,13 +26,11 @@ export interface WidgetData {
 interface WidgetProps {
   data: WidgetData
   timeOfDay: TimeOfDay
-  currentView: 'widget' | 'settings'
-  onViewChange: (view: 'widget' | 'settings') => void
   isExpanded: boolean
   onToggleExpand: () => void
 }
 
-export const Widget: React.FC<WidgetProps> = ({ data, timeOfDay, currentView, onViewChange, isExpanded, onToggleExpand }) => {
+export const Widget: React.FC<WidgetProps> = ({ data, timeOfDay, isExpanded, onToggleExpand }) => {
   const shouldReduceMotion = useReducedMotion()
   
   // Format times nicely (e.g. 32m, 1h 4m)
@@ -147,43 +146,20 @@ export const Widget: React.FC<WidgetProps> = ({ data, timeOfDay, currentView, on
             Idle detection on
           </span>
         </div>
-
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => onViewChange('widget')}
-            style={{ 
-              padding: '4px 8px', 
-              fontSize: '11px', 
-              background: currentView === 'widget' ? 'rgba(255,255,255,0.06)' : 'transparent',
-              color: currentView === 'widget' ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.3)',
-              borderRadius: '6px',
-              border: 'none',
-              cursor: 'pointer',
-              transition: 'all 120ms ease'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
-            onMouseLeave={(e) => e.currentTarget.style.background = currentView === 'widget' ? 'rgba(255,255,255,0.06)' : 'transparent'}
-          >
-            Focus
-          </button>
-          <button
-            onClick={() => onViewChange('settings')}
-            style={{ 
-              padding: '4px 8px', 
-              fontSize: '11px', 
-              background: currentView === 'settings' ? 'rgba(255,255,255,0.06)' : 'transparent',
-              color: currentView === 'settings' ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.3)',
-              borderRadius: '6px',
-              border: 'none',
-              cursor: 'pointer',
-              transition: 'all 120ms ease'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
-            onMouseLeave={(e) => e.currentTarget.style.background = currentView === 'settings' ? 'rgba(255,255,255,0.06)' : 'transparent'}
-          >
-            Settings
-          </button>
-        </div>
+        
+        <button 
+          onClick={useTrackingStore.getState().selectAndSetBackgroundImage}
+          title="Set Background Image"
+          style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px', opacity: 0.5, transition: 'opacity 0.2s' }}
+          onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+          onMouseLeave={(e) => e.currentTarget.style.opacity = '0.5'}
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#fff' }}>
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <polyline points="21 15 16 10 5 21" />
+          </svg>
+        </button>
       </div>
     </motion.div>
   )

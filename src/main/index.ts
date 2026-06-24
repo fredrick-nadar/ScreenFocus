@@ -148,8 +148,8 @@ function createWindow(): BrowserWindow {
     mainWindow?.show()
     try {
       const db = getDb()
-      const row = db.prepare('SELECT value FROM settings WHERE key = ?').get('always_on_top') as { value: string } | undefined
-      const alwaysOnTop = row ? row.value === 'true' : false
+      const alwaysOnTopRow = db.prepare('SELECT value FROM settings WHERE key = ?').get('always_on_top') as { value: string } | undefined
+      const alwaysOnTop = alwaysOnTopRow ? alwaysOnTopRow.value === 'true' : false
       if (alwaysOnTop) {
         mainWindow?.setAlwaysOnTop(true)
       } else {
@@ -159,6 +159,13 @@ function createWindow(): BrowserWindow {
       const opacityRow = db.prepare('SELECT value FROM settings WHERE key = ?').get('widget_opacity') as { value: string } | undefined
       if (opacityRow && mainWindow) {
         mainWindow.setOpacity(parseFloat(opacityRow.value))
+      }
+
+      const startWithWindowsRow = db.prepare('SELECT value FROM settings WHERE key = ?').get('start_with_windows') as { value: string } | undefined
+      if (startWithWindowsRow && startWithWindowsRow.value === 'true') {
+        app.setLoginItemSettings({ openAtLogin: true })
+      } else {
+        app.setLoginItemSettings({ openAtLogin: false })
       }
     } catch (err) {
       console.error('[index] Failed to load startup settings from database:', err)

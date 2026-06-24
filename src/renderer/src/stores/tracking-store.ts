@@ -104,6 +104,7 @@ interface TrackingState {
   selectAndSetIcon: (appName: string) => Promise<void>
   deleteCustomIcon: (appName: string) => Promise<void>
   fetchBackgroundImage: () => Promise<void>
+  selectAndSetBackgroundImage: () => Promise<void>
   updateCustomIcon: (appName: string, dataUrl: string) => void
   handleTrackingUpdate: (data: TrackingUpdate) => void
   toggleTracking: () => Promise<void>
@@ -252,6 +253,17 @@ export const useTrackingStore = create<TrackingState>((set, get) => ({
       set({ backgroundImage })
     } catch (err) {
       console.error('Failed to fetch background image:', err)
+    }
+  },
+
+  selectAndSetBackgroundImage: async () => {
+    try {
+      const newBg = await api().selectAndSetBackgroundImage()
+      if (newBg) {
+        set({ backgroundImage: newBg })
+      }
+    } catch (err) {
+      console.error('Failed to set background image:', err)
     }
   },
 

@@ -86,6 +86,9 @@ interface TrackingState {
   // Background image
   backgroundImage: string | null
 
+  // History
+  historySessions: Record<string, AppUsage[]>
+
   // System info
   systemInfo: SystemInfo | null
 
@@ -96,6 +99,7 @@ interface TrackingState {
   fetchAll: () => Promise<void>
   fetchTodayData: () => Promise<void>
   fetchWeeklyData: () => Promise<void>
+  fetchSessionsForDate: (date: string) => Promise<void>
   fetchGoals: () => Promise<void>
   fetchStreaks: () => Promise<void>
   fetchInsights: () => Promise<void>
@@ -128,6 +132,7 @@ export const useTrackingStore = create<TrackingState>((set, get) => ({
 
   customIcons: {},
   backgroundImage: null,
+  historySessions: {},
 
   systemInfo: null,
 
@@ -146,6 +151,17 @@ export const useTrackingStore = create<TrackingState>((set, get) => ({
       get().fetchBackgroundImage()
     ])
     set({ isLoading: false })
+  },
+
+  fetchSessionsForDate: async (date: string) => {
+    try {
+      const sessions = await api().getSessionsForDate(date)
+      set((state) => ({
+        historySessions: { ...state.historySessions, [date]: sessions }
+      }))
+    } catch (err) {
+      console.error(`Failed to fetch sessions for ${date}:`, err)
+    }
   },
 
   fetchTodayData: async () => {

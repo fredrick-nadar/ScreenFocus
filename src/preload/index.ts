@@ -3,6 +3,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 export interface ElectronAPI {
   // Data queries
   getTodaySessions: () => Promise<any[]>
+  getSessionsForDate: (date: string) => Promise<any[]>
   getTodayStats: () => Promise<any>
   getTodayCategoryTotals: () => Promise<Record<string, number>>
   getTodayTotalActive: () => Promise<number>
@@ -46,6 +47,7 @@ export interface ElectronAPI {
 const api: ElectronAPI = {
   // Data queries
   getTodaySessions: () => ipcRenderer.invoke('get-today-sessions'),
+  getSessionsForDate: (date: string) => ipcRenderer.invoke('get-sessions-for-date', date),
   getTodayStats: () => ipcRenderer.invoke('get-today-stats'),
   getTodayCategoryTotals: () => ipcRenderer.invoke('get-today-category-totals'),
   getTodayTotalActive: () => ipcRenderer.invoke('get-today-total-active'),

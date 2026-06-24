@@ -27,10 +27,12 @@ export class TrackingService {
   private win: BrowserWindow
   private isPaused = false
   private pollingMs = 1000
+  private currentDay: string
 
   constructor(win: BrowserWindow) {
     this.win = win
     this.idleDetector = new IdleDetector()
+    this.currentDay = new Date().toISOString().split('T')[0]
 
     // Handle idle transitions
     this.idleDetector.on('idle-start', () => {
@@ -203,6 +205,17 @@ export class TrackingService {
 
   private async pollActiveWindow(): Promise<void> {
     try {
+      // ── Day Change Detection ──
+      const today = new Date().toISOString().split('T')[0]
+      if (today !== this.currentDay) {
+        if (this.currentSession) {
+          this.finalizeSession()
+        }
+        this.currentDay = today
+        // Re-aggregate so stats for the new day are initialized
+        aggregateAndSaveTodayStats()
+      }
+
       const windowInfo = await this.getActiveWindowInfo()
 
       if (!windowInfo || !windowInfo.appName) return

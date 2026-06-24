@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron'
-import { getTodaySessions, getHourlyBreakdown, getTodayCategoryTotals, getTodayTotalActiveSeconds } from './database/sessions'
+import { getTodaySessions, getSessionsForDate, getHourlyBreakdown, getTodayCategoryTotals, getTodayTotalActiveSeconds } from './database/sessions'
 import { getTodayStats, getWeeklyStats, getStreaks } from './database/daily-stats'
 import { getGoalProgress, upsertGoal, deleteGoal } from './database/goals'
 import { setCategoryOverride, getCategoryOverrides, getAllCategories } from './tracking/categorizer'
@@ -13,6 +13,10 @@ export function registerIpcHandlers(trackingService: TrackingService): void {
   // ── Tracking Data ──────────────────────────────────────────────
   ipcMain.handle('get-today-sessions', () => {
     return getTodaySessions()
+  })
+
+  ipcMain.handle('get-sessions-for-date', (_event, date: string) => {
+    return getSessionsForDate(date)
   })
 
   ipcMain.handle('get-today-stats', () => {

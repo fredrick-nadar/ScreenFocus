@@ -33,6 +33,13 @@ export default function App() {
     }
   }, [fetchAll, fetchSettings])
 
+  const { settings } = useSettingsStore()
+  useEffect(() => {
+    if (settings && settings['accent_color']) {
+      document.documentElement.style.setProperty('--accent-color', settings['accent_color'])
+    }
+  }, [settings])
+
   // Listen for tracking updates from main process
   useEffect(() => {
     const cleanup = api().onTrackingUpdate((data) => {

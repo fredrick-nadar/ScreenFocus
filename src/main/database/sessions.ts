@@ -55,6 +55,27 @@ export function getTodaySessions(): AppUsageSummary[] {
   return stmt.all(todayStart) as AppUsageSummary[]
 }
 
+export function getSessionsForDate(dateStr: string): AppUsageSummary[] {
+  const db = getDb()
+  // Generate start and end of that specific date
+  const dayStart = new Date(dateStr).setHours(0, 0, 0, 0)
+  const dayEnd = new Date(dateStr).setHours(23, 59, 59, 999)
+
+  const stmt = db.prepare(`
+    SELECT
+      app_name,
+      category,
+      SUM(duration_seconds) as total_seconds,
+      COUNT(*) as session_count
+    FROM sessions
+    WHERE start_time >= ? AND start_time <= ? AND is_idle = 0
+    GROUP BY app_name
+    ORDER BY total_seconds DESC
+  `)
+
+  return stmt.all(dayStart, dayEnd) as AppUsageSummary[]
+}
+
 export function getTodaySessionsRaw(): Session[] {
   const db = getDb()
   const todayStart = getTodayStartTimestamp()
